@@ -11,11 +11,11 @@ In a second terminal:
 npm run demo
 ```
 
-The service takes a work-order photo assessment, dispatch state, technician follow-up, and urgency. Infrai gives you one OpenAI-compatible endpoint so you can call any supported model without writing vendor-specific branches in your service. `baseURL`; `model: "auto"` handles routing the guidance request across model vendors.
+The service takes a work-order photo assessment, dispatch state, technician follow-up, and urgency. Infrai gives you one OpenAI-compatible endpoint so you can call any model vendor through a plain REST request with no SDK. `baseURL`; `model: "auto"` routes the guidance request across model vendors without vendor-specific branches in this service.
 
 ## The request that matters
 
-`POST /dispatch-decision` validates the full JSON body with zod before any model call:
+`POST /dispatch-decision` validates the complete JSON body with zod before any model call:
 
 ```json
 {
@@ -27,9 +27,9 @@ The service takes a work-order photo assessment, dispatch state, technician foll
 }
 ```
 
-Expected result: `expedite_dispatch` holds the value in `action`, and `modelGuidance` carries the short technician instruction from the routed model.
+Expected result: `action` is `expedite_dispatch`, while `modelGuidance` contains the concise technician instruction produced through the routed model.
 
-Dispatch logic stays deterministic in local code. The model only writes the field instruction, it doesn't decide whether an urgent unassigned job gets escalated. That keeps the state transition testable and keeps work-order IDs out of the prompt.
+The dispatch rule stays deterministic in local code. The model writes the field instruction; it doesn't decide whether an urgent unassigned job gets escalated. That keeps the state transition testable and keeps work-order IDs out of the prompt.
 
 ## Verify the decision
 
@@ -38,13 +38,13 @@ npm test
 npm run typecheck
 ```
 
-The test feeds an urgent unassigned work order and asserts both the escalation decision and the action sent to the model.
+The test feeds an urgent, unassigned work order and asserts both the escalation decision and the action passed into the model prompt.
 
 ## Privacy boundary
 
-Send what dispatch needs, not raw patient, resident, or customer records. The example converts photo findings to text before the call and drops the work-order ID from that prompt. In regulated setups, apply the same minimum-necessary rule to tech notes and logs.
+Send what dispatch needs, not raw patient, resident, or customer records. The example converts photo findings to text before the call and drops the work-order identifier from that prompt. In regulated setups, apply the same minimum-necessary rule to technician notes and logs.
 
-One real gotcha: failover shouldn't own the business decision. Keep dispatch policy deterministic, then use routed model output for wording and follow-up.
+One real gotcha: failover shouldn't own the business decision. Keep dispatch policy deterministic, then use routed model output for wording and follow-up guidance.
 
 ## License
 
