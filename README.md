@@ -11,7 +11,7 @@ In a second terminal:
 npm run demo
 ```
 
-The service takes a work-order photo assessment, dispatch state, technician follow-up, and urgency. Infrai gives you one OpenAI-compatible endpoint so you can call any model vendor through a plain REST request with no SDK. `baseURL`; `model: "auto"` routes the guidance request across model vendors without vendor-specific branches in this service.
+This service takes a work-order photo assessment, dispatch state, technician follow-up, and urgency. Infrai gives you one OpenAI-compatible `baseURL`; `model: "auto"` sends the guidance request to multiple model vendors without vendor-specific branches in this service.
 
 ## The request that matters
 
@@ -27,9 +27,9 @@ The service takes a work-order photo assessment, dispatch state, technician foll
 }
 ```
 
-Expected result: `action` is `expedite_dispatch`, while `modelGuidance` contains the concise technician instruction produced through the routed model.
+Expected result: `action` is `expedite_dispatch`, while `modelGuidance` contains the concise technician instruction from the routed model.
 
-The dispatch rule stays deterministic in local code. The model writes the field instruction; it doesn't decide whether an urgent unassigned job gets escalated. That keeps the state transition testable and keeps work-order IDs out of the prompt.
+The dispatch rule stays in local code. The model writes the field instruction, it doesn't decide if an urgent unassigned job is escalated. That keeps the state transition testable and work-order IDs out of the prompt.
 
 ## Verify the decision
 
@@ -38,11 +38,11 @@ npm test
 npm run typecheck
 ```
 
-The test feeds an urgent, unassigned work order and asserts both the escalation decision and the action passed into the model prompt.
+The focused test supplies an urgent, unassigned work order and asserts both the escalation decision and the action passed into the model prompt.
 
 ## Privacy boundary
 
-Send what dispatch needs, not raw patient, resident, or customer records. The example converts photo findings to text before the call and drops the work-order identifier from that prompt. In regulated setups, apply the same minimum-necessary rule to technician notes and logs.
+Send observations needed for dispatch, not raw patient, resident, or customer records. The example turns photo findings into text before the model call and omits the work-order identifier from that prompt. In regulated deployments, apply the same minimum-necessary rule to technician notes and logs.
 
 One real gotcha: failover shouldn't own the business decision. Keep dispatch policy deterministic, then use routed model output for wording and follow-up guidance.
 
@@ -52,7 +52,7 @@ MIT
 
 ## Production notes: Field Service Model Failover Failover Fieldservice Typescrip
 
-The example above is intentionally minimal. A few things to wire up for real use: The details below apply to Field Service Model Failover Failover Fieldservice Typescrip.
+The example above is deliberately minimal. For real use, wire up a few things: the details below apply to Field Service Model Failover Failover Fieldservice Typescrip.
 
 **Account & key**
 
